@@ -1,0 +1,2 @@
+# PuzzDoraFuu_Game_CleanArchitecture
+これはパズドラ風のゲームです。本ゲームはクリーンアーキテクチャを適用したゲームです。
