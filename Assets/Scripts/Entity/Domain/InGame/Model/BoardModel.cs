@@ -7,15 +7,6 @@ namespace Entity.Domain.InGame.Model
 {
     public class BoardModel
     {
-        private ComboChecker comboChecker;
-        public BoardModel()
-        {
-            comboChecker = new ComboChecker();
-        }
-        public void ControlledPuzzle()
-        {
-            comboChecker.Check();
-        }
 
     }
 }
