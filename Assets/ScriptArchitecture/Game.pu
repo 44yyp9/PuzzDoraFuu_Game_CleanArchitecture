@@ -1,0 +1,383 @@
+@startuml Game
+
+namespace Frameworks{
+    namespace View{
+        namespace InGame{
+            class PlayerView{
+            }
+            class EnemyView{
+            }
+            class BoardView{
+            }
+        }
+    }
+}
+Frameworks.View.InGame.PlayerView ..down..> UseCase.InGame.Presenter.ViewInterFace.IPlayerView
+Frameworks.View.InGame.EnemyView ..down..> UseCase.InGame.Presenter.ViewInterFace.IEnemyView
+Frameworks.View.InGame.BoardView ..down..> UseCase.InGame.Presenter.ViewInterFace.IBoardView
+
+namespace InterfaceAdapters{
+    namespace FastAPI{
+    }
+    namespace DB{
+    }
+}
+namespace UseCase{
+    namespace InGame{
+    namespace Core{
+        class InGameProcessor{
+            -PlayerPresenter playerPresenter
+            -EnemyPresenter enemyPresenter
+            -BoardPresenter boardPresenter
+            -TurnChecker turnChecker
+        }
+    }
+    namespace Presenter{
+        namespace ViewInterFace{
+            interface IPlayerView{
+                +void UpdatePlayerHP(int currentHP)
+                +void UpdatePlayerShield(int shieldPower)
+            }
+            interface IEnemyView{
+                +void UpdateEnemyList(List<EnemyInfo> enemies)
+            }
+            interface IBoardView{
+                +void UpdateBoard(DropType[,] grid)
+            }
+        }
+        class PlayerPresenter{
+            -IPlayerView view
+        }
+        class EnemyPresenter{
+            -IEnemyView view
+        }
+        class BoardPresenter{
+            -IBoardView view
+        }
+        PlayerPresenter -up-> ViewInterFace.IPlayerView
+        EnemyPresenter -up-> ViewInterFace.IEnemyView
+        BoardPresenter -up-> ViewInterFace.IBoardView
+    }
+    Core.InGameProcessor -down-> Presenter.PlayerPresenter
+    Core.InGameProcessor -down-> Presenter.EnemyPresenter
+    Core.InGameProcessor -down-> Presenter.BoardPresenter
+    }
+}
+
+UseCase.InGame.Core.InGameProcessor --down--> Entity.Domain.InGame.Core.Battle.Turn.TurnChecker
+UseCase.InGame.Presenter.PlayerPresenter --down--> Entity.Domain.InGame.Core.Battle.Turn.PlayerTurn
+UseCase.InGame.Presenter.EnemyPresenter --down--> Entity.Domain.InGame.Core.Battle.Turn.EnemyTurn
+UseCase.InGame.Presenter.BoardPresenter --down--> Entity.Domain.InGame.Model.BoardModel
+
+namespace Entity{
+    namespace Domain{
+        namespace InGame{
+        namespace Core{
+            enum DropType{
+                SingleAttack
+                MultiAttack
+                Heal
+                Shield
+            }
+            enum DropEffect{
+                SingleAttack
+                MultiAttack
+                Heal
+                MultiHeal
+                Shield
+                MultiShield
+            }
+            enum EnemyType{
+                //抽象的な分類
+                Normal
+                Boss
+            }
+            enum Enemys{
+                //具体的な名称
+                Slime
+                Goblin
+                Dragon
+            }
+            namespace Battle{
+                namespace Turn{
+                    interface IRequestChangeTurn{
+                        +void RequestChangeTurn(TurnType turn)
+                        +void RequestNextTurn()
+                    }
+                    class TurnChecker{
+                        -StageInfo stageInfo
+                        -TurnType currentTurn
+                        -ITurn currentTurnInstance
+                        -int turnCount
+                        -WaveChecker waveChecker
+                        -GameEndChecker gameEndChecker
+                        +void RequestChangeTurn(TurnType turn)
+                        +void RequestNextTurn()
+                        +TurnType GetCurrentTurn()
+                    }
+                    TurnChecker .up.> IRequestChangeTurn
+                    enum TurnType{
+                        Player1Turn
+                        Player2Turn
+                        EnemyTurn
+                    }
+                    interface ITurn{
+                        +void ExecuteTurn()
+                    }
+                    class PlayerTurn{
+                        -List<PlayerModel> players
+                        -BoardModel boardModel
+                        +void ExecuteTurn()
+                    }
+                    class EnemyTurn{
+                        -List<Enemy> enemies
+                        +void ExecuteTurn()
+                    }
+                    PlayerTurn .up.> ITurn
+                    EnemyTurn .up.> ITurn
+                    TurnChecker -down-> ITurn
+                }
+                namespace Wave{
+                    class WaveInitializer{
+                        -EnemyFactory enemyFactory
+                        +void NormalSummonEnemies(List<Enemys> enemies)
+                        +void BossSummonEnemy(List<Enemys> enemies)
+                    }
+                    interface IRequestChangeNextWave{
+                        +void RequestChangeNextWave()
+                    }
+                    class WaveChecker{
+                        -int maxWave
+                        -int currentWave
+                        -WaveInitializer waveInitializer
+                        -GameClear gameClear
+                        +void RequestChangeNextWave()
+                        +void ClearGame()
+                        +int GetCurrentWave()
+                    }
+                    WaveChecker .up.> IRequestChangeNextWave
+                    WaveChecker -down-> WaveInitializer
+                }
+                namespace GameEnd{
+                    class GameEndChecker{
+                        -GameOver gameOver
+                        -GameClear gameClear
+                    }
+                    class GameOver{
+                    }
+                    class GameClear{
+                    }
+                    GameEndChecker -down-> GameOver
+                    GameEndChecker -down-> GameClear
+                }
+                Turn.TurnChecker -down-> Wave.WaveChecker
+                Turn.TurnChecker -down-> GameEnd.GameEndChecker
+            }
+            namespace Stage{
+                class StageInfo{
+                    //スクリプタブルオブジェクト
+                    //Enemyの種類とWaveごとの出現数を書く
+                }
+            }
+            Battle.Turn.TurnChecker -up-> Stage.StageInfo
+        }
+        Core.Battle.Wave.WaveInitializer -down-> DomainEntity.Enemy.EnemyFactory
+        namespace Model{
+            class BoardModel{
+                -Board board
+                -BoardCreator boardCreator
+                -ComboChecker comboChecker
+                -CheckedResult result
+                +void InitializeBoard(int width, int height)
+                +void ControlledPuzzle()
+                +CheckedResult GetResult()
+            }
+            class PlayerModel{
+                +PlayerHPModel hpModel{ get; private set; }
+                +PlayerStatusModel statusModel{ get; private set; }
+            }
+        }
+        namespace DomainEntity{
+            namespace Player{
+            interface IDamageable{
+                +void Damage(int damage)
+            }
+            interface IHealable{
+                +void Heal(int heal)
+            }
+            interface IShieldable{
+                +void SetShieldPower(int shield)
+            }
+            class PlayerHPModel{
+                -int maxHP
+                -int currentHP
+                -int minHP
+                +void Damage(int damage)
+                +void Heal(int heal)
+                +int GetCurrentHP()
+            }
+            PlayerHPModel .up.> IDamageable
+            PlayerHPModel .up.> IHealable
+            class PlayerStatusModel{
+                -int shieldPower
+                +int GetShieldPower()
+                +void SetShieldPower(int shield)
+            }
+            PlayerStatusModel .up.> IShieldable
+            }
+            namespace Enemy{
+                class EnemyHPModel{
+                    -int maxHP
+                    -int currentHP
+                    -int minHP
+                    +void Damage(int damage)
+                    +int GetCurrentHP()
+                }
+                class EnemyStatusModel{
+                    -int attackPower
+                    +int GetAttackPower()
+                }
+                interface IAttackable{
+                    +void AttackPlayer(IDamageable playerHPModel)
+                }
+                class Enemy{
+                    -EnemyType enemyType
+                    -EnemyHPModel hpModel{ get; private set; }
+                    -EnemyStatusModel statusModel{ get; private set; }
+                    +void AttackPlayer(IDamageable playerHPModel)
+                }
+                Enemy .up.> IAttackable
+                Enemy -down-> EnemyHPModel
+                Enemy -down-> EnemyStatusModel
+                EnemyHPModel .up.> IDamageable
+                abstract class EnemyFactory{
+                    +abstract Enemy CreateEnemy()
+                }
+                class SlimeFactory{
+                    +override Enemy CreateEnemy()
+                }
+                class GoblinFactory{
+                    +override Enemy CreateEnemy()
+                }
+                class DragonFactory{
+                    +override Enemy CreateEnemy()
+                }
+                EnemyFactory -right-> Enemy
+                SlimeFactory .up.> EnemyFactory
+                GoblinFactory .up.> EnemyFactory
+                DragonFactory .up.> EnemyFactory
+            }
+        }
+        Model.PlayerModel -down-> DomainEntity.Player.PlayerHPModel
+        Model.PlayerModel -down-> DomainEntity.Player.PlayerStatusModel
+        DomainEntity.Enemy.IAttackable -up->Model.PlayerModel
+        namespace Puzzle{
+            class Board{
+                -int width
+                -int height
+                -DropType[,] grid
+                +Board(int width, int height)
+                +DropType[,] GetGrid()
+                +void SetGrid(DropType[,] grid)
+            }
+            class BoardCreator{
+                +Board CreateBoard(Board board)
+            }
+            class ComboChecker{
+                -CommandProcessor commandProcessor
+                -List<ComboCommand> combos
+                -List<ICommandAction> actionCommands
+                -CheckedResult result
+                -void Check()
+                -CheckedResult GetCheckedResult()
+                +CheckedResult CheckCombo(Board board)
+                //combosが最初にコンボの状態の入れ子になり
+                //CommandProcessorでルールの適用をしてactionCommandsに変換する
+            }
+            ComboChecker -down-> CommandProcessor
+            ComboChecker -down-> ComboCommand
+            ComboChecker -down-> ICommandAction
+            ComboChecker -down-> CheckedResult
+            class CheckedResult{
+                -List<ICommandAction> combos{ get; private set; }
+                -Board boardResult{ get; private set; }
+                +CheckedResult(List<ICommandAction> combos, Board boardResult)
+                +ICommandAction RequestUseCommand()
+                +Board GetBoardResult()
+            }
+            interface ICommandAction{
+                +IDropEffectable GetEffectable()
+            }
+            class CommandAction{
+                -DropEffect dropEffect
+                -int dropCount
+                +CommandAction(DropEffect dropEffect, int dropCount)
+                +IDropEffectable GetEffectable()
+            }
+            CommandAction .up.> ICommandAction
+            class CommandProcessor{
+                //コマンドの整理を行う
+                +List<ICommandAction> ProcessCommands(List<ComboCommand> commands)
+            }
+            class ComboCommand{
+                +DropType DropType{ get; private set; }
+                +int DropCount{ get; private set; }
+                +ComboCommand(DropType dropType, int dropCount)
+            }
+        }
+        Model.BoardModel -down-> Puzzle.Board
+        Model.BoardModel -down-> Puzzle.BoardCreator
+        Model.BoardModel -down-> Puzzle.ComboChecker
+        namespace Drop{
+            interface IDropEffectable{
+                +void Effect(T target,int dropCount)
+            }
+            class SingleAttackDrop{
+                +void Effect(IDamageable target,int dropCount)
+            }
+            class MultiAttackDrop{
+                +void Effect(List<IDamageable> targets,int dropCount)
+            }
+            class HealDrop{
+                +void Effect(IHealable target,int dropCount)
+            }
+            class ShieldDrop{
+                +void Effect(IShieldable target,int dropCount)
+            }
+            class MultiShield{
+                +void Effect(List<IShieldable> targets,int dropCount)
+            }
+            class MultiHeal{
+                +void SetUpgradeNumber(int number)
+                +void Effect(IHealable target,int dropCount)
+            }
+            SingleAttackDrop .up.> IDropEffectable
+            MultiAttackDrop .up.> IDropEffectable
+            HealDrop .up.> IDropEffectable
+            ShieldDrop .up.> IDropEffectable
+            MultiHeal .up.> IDropEffectable
+            MultiShield .up.> IDropEffectable
+        }
+        Puzzle.CommandAction -down-> Drop.IDropEffectable
+        Core.Battle.Turn.PlayerTurn -down-> Model.PlayerModel
+        Core.Battle.Turn.PlayerTurn -down-> Model.BoardModel
+    }
+    namespace Title{
+        class ToInGameModel{
+        }
+        class ToMatchModel{
+        }
+        class ToExitModel{
+        }
+    }
+    namespace CoreSystem{
+    }
+    }
+}
+
+Frameworks ---down---> UseCase
+InterfaceAdapters ---down---> UseCase
+UseCase ---down---> Entity
+
+
+@enduml
