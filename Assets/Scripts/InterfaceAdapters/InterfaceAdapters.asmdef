@@ -1,0 +1,16 @@
+{
+    "name": "InterfaceAdapters",
+    "rootNamespace": "InterfaceAdapters",
+    "references": [
+        "GUID:6b19634df2f058643be1c963de016fc0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
