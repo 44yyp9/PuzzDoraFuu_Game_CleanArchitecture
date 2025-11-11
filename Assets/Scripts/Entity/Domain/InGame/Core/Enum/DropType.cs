@@ -4,6 +4,10 @@ namespace Entity.Domain.InGame.Core
 {
     public enum DropType
     {
-        
+        SingleAttack,
+        MultiAttack,
+        Heal,
+        Shield,
+        Empty
     }
 }
