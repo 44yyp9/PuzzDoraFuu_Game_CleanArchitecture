@@ -2,8 +2,19 @@ using UnityEngine;
 
 namespace Entity.Domain.InGame.Effect
 {
-    public class MultiShield
+    public class MultiShield:IEffectable
     {
-        
+        public void Effect()
+        {
+            
+        }
+        public int GetDefaultPower()
+        {
+            return 0;
+        }
+        public void SetPower(int power)
+        {
+            
+        }
     }
 }
