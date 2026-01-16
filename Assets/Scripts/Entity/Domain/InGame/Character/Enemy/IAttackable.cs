@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Entity.Domain.InGame.Character.Enemy
@@ -6,6 +7,6 @@ namespace Entity.Domain.InGame.Character.Enemy
     //現在は未使用
     public interface IAttackable<T>
     {
-        public void Attack(T taget);
+        public void Attack(List<T> taget);
     }
 }
