@@ -4,6 +4,6 @@ namespace Entity.Domain.InGame.Battle.Turn
 {
     public interface ITurn
     {
-        
+        public void ExecuteTurn();
     }
 }

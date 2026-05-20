@@ -35,6 +35,11 @@ namespace Entity.Domain.InGame.Character.Enemy
             canDead=true;
         }
 
+        public bool GetDead()
+        {
+            return canDead;
+        }
+
         public int GetCurrentHP()
         {
             return currentHP;

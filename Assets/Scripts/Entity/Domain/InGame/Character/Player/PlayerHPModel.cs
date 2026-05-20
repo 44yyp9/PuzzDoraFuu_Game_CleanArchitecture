@@ -7,16 +7,23 @@ namespace Entity.Domain.InGame.Character.Player
         private const int maxHp = 100;
         private const int minHp = 0;
         private int currentHp;
+        private IShieldable shieldable;
         private bool canDead;
 
-        public PlayerHPModel()
+        public PlayerHPModel(IShieldable shieldable)
         {
-            currentHp=maxHp;
+            currentHp = maxHp;
             canDead = false;
+            this.shieldable = shieldable;
         }
         public void Damage(int amount)
         {
-            var hp=currentHp-amount;
+            //シールドによるガード
+            var damage = shieldable.GetShield() - amount;
+            shieldable.Damage();
+            if (damage >= 0) return;
+
+            var hp=currentHp+damage;
             if (hp <= minHp)
             {
                 //死亡判定
@@ -45,7 +52,10 @@ namespace Entity.Domain.InGame.Character.Player
         {
             canDead=true;
         }
-
+        public bool GetDead()
+        {
+            return canDead;
+        }
         public int GetCurrentHp()
         {
             return currentHp;

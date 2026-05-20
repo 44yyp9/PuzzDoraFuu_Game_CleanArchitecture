@@ -4,6 +4,7 @@ namespace Entity.Domain.InGame.Core
 {
     public enum EnemyType
     {
-        
+        Slime,
+        Goblin
     }
 }

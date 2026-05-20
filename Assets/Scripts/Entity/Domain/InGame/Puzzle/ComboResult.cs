@@ -15,6 +15,7 @@ namespace Entity.Domain.InGame.Puzzle
             this.comboCount = comboCount;
             
             currentCombo = 0;
+            Debug.Log(commandOrder.Count);
         }
 
         public IEffectable RequestUseCommand()

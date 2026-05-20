@@ -1,0 +1,39 @@
+{
+  "Stages": [
+    {
+      "Stage": 0,
+      "Enemies": [
+        { "JsonType": "Goblin"},
+        { "JsonType": "Slime"}
+      ]
+    },
+    {
+      "Stage": 1,
+      "Enemies": [
+        { "JsonType": "Goblin"},
+        { "JsonType": "Slime"}
+      ]
+    },
+    {
+      "Stage": 2,
+      "Enemies": [
+        { "JsonType": "Goblin"},
+        { "JsonType": "Slime"}
+      ]
+    },
+    {
+      "Stage": 3,
+      "Enemies": [
+        { "JsonType": "Slime"},
+        { "JsonType": "Slime"}
+      ]
+    },
+    {
+      "Stage": 4,
+      "Enemies": [
+        { "JsonType": "Goblin"},
+        { "JsonType": "Slime"}
+      ]
+    }
+  ]
+}

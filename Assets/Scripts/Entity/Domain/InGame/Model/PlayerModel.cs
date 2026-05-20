@@ -9,8 +9,8 @@ namespace Entity.Domain.InGame.Model
         public PlayerStatusModel PlayerStatusModel { get; private set; }
         public PlayerModel()
         {
-            PlayerHpModel=new PlayerHPModel();
             PlayerStatusModel=new PlayerStatusModel();
+            PlayerHpModel = new PlayerHPModel((IShieldable)PlayerStatusModel);
         }
     }
 }
