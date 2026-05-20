@@ -1,9 +1,18 @@
+using Entity.Domain.InGame.Character.Player;
 using UnityEngine;
 
 namespace Entity.Domain.InGame.Character.Enemy
 {
-    public class SlimeFactory
+    public class SlimeFactory:EnemyFactory
     {
-        
+        private const int maxHp = 100;
+        private const int power = 10;
+        public override Enemy CreateEnemy()
+        {
+            EnemyHPModel enemyHpModel = new EnemyHPModel(maxHp);
+            EnemyStatusModel enemyStatusModel = new EnemyStatusModel(power);
+            IAttackable<IDamageable> attackable = new SlimeAttack();
+            return new Enemy(enemyHpModel, enemyStatusModel,attackable);
+        }
     }
 }

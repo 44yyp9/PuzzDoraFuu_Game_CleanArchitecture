@@ -1,9 +1,12 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Entity.Domain.InGame.Character.Enemy
 {
-    public interface IAttackable
+    //使用するか迷ってる
+    //現在は未使用
+    public interface IAttackable<T>
     {
-        
+        public void Attack(List<T> taget);
     }
 }

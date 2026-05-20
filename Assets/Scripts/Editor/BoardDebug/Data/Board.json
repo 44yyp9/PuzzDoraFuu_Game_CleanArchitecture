@@ -1,0 +1,12 @@
+{
+    "width": 5,
+    "height": 6,
+    "board": [
+        "Shield,SingleAttack,SingleAttack,SingleAttack,Shield",
+        "SingleAttack,Shield,Shield,SingleAttack,Shield",
+        "Shield,Shield,SingleAttack,Shield,MultiAttack",
+        "Heal,SingleAttack,Shield,MultiAttack,Shield",
+        "Shield,Heal,Shield,SingleAttack,MultiAttack",
+        "Heal,SingleAttack,Heal,Shield,Heal"
+    ]
+}
